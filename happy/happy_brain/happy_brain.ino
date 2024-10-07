@@ -11,6 +11,8 @@
 #define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+int ascii = 0;
+
 void setup()
 {
   Serial.begin(9600);
@@ -23,11 +25,6 @@ void setup()
 
   // Clear the buffer.
   display.clearDisplay();
-
-
-}
-
-void loop() {
     // Display Text
   display.setTextSize(1);
   display.setTextColor(WHITE);
@@ -39,11 +36,31 @@ void loop() {
 
   
   // Display ASCII Characters
-  display.setCursor(0,24);
+  display.setCursor(32,24);
   display.setTextSize(2);
   display.write(3);
   display.display();
   delay(2000);
   display.clearDisplay();
+
+
+}
+
+void loop() {
+
+  ascii += 1;
+
+  // Display ASCII Characters
+  display.setCursor(32,24);
+  display.setTextSize(2);
+  display.write(ascii);
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+
+  Serial.println(ascii);
+  
+
+
 
 }
