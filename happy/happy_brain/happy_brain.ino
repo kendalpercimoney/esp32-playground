@@ -11,56 +11,85 @@
 #define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-int ascii = 0;
 
-void setup()
-{
+
+// Global Variables
+unsigned long previousMillis = 0;
+unsigned long blinkInterval;
+unsigned long normalInterval = 100; // Default interval for closed eyes
+bool isBlinking = false;
+
+// Initialize display setup
+void setup() {
   Serial.begin(9600);
   
-  // initialize the OLED object
+  // Initialize the OLED object
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
 
-  // Clear the buffer.
   display.clearDisplay();
-    // Display Text
+  
+  // Display startup messages
+  displayText("kendal percimoney", "is my creator.", 2000);
+  displayText("built by percimoney", "industries inc.", 2000);
+
+  // Set up initial display for normal eyes
+  showNormalEyes();
+  blinkInterval = random(3000, 20000);
+}
+
+
+
+// Display startup text messages
+void displayText(String line1, String line2, int displayTime) {
+  display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.setCursor(0,28);
-  display.println("Hello my creator!");
+  display.setCursor(0, 28);
+  display.println(line1);
+  display.setCursor(0, 35);
+  display.println(line2);
   display.display();
-  delay(2000);
+  delay(displayTime);
   display.clearDisplay();
+}
 
-  
-  // Display ASCII Characters
-  display.setCursor(32,24);
-  display.setTextSize(2);
-  display.write(3);
+// Function for normal open eyes
+void showNormalEyes() {
+  display.clearDisplay();
+  display.setTextSize(3);
+  display.setTextColor(WHITE);
+  display.setCursor(18, 10);
+  display.println("O ^ O");
   display.display();
-  delay(2000);
+}
+
+// Function for blinking eyes
+void showBlinkingEyes() {
   display.clearDisplay();
-
-
+  display.setTextSize(3);
+  display.setTextColor(WHITE);
+  display.setCursor(18, 10);
+  display.println("- ^ -");
+  display.display();
 }
 
 void loop() {
+  unsigned long currentMillis = millis();
 
-  ascii += 1;
-
-  // Display ASCII Characters
-  display.setCursor(32,24);
-  display.setTextSize(2);
-  display.write(ascii);
-  display.display();
-  delay(2000);
-  display.clearDisplay();
-
-  Serial.println(ascii);
-  
-
-
-
+  if (!isBlinking && currentMillis - previousMillis >= blinkInterval) {
+    // when not blinking and time is up, blink. 
+    isBlinking = true; //set blinking to true
+    previousMillis = currentMillis;
+    showBlinkingEyes();
+  } 
+  else if (isBlinking && currentMillis - previousMillis >= normalInterval) {
+    // when blinking true and time is up, return to normal eyes
+    isBlinking = false;
+    previousMillis = currentMillis;
+    showNormalEyes();
+    blinkInterval = random(3000, 20000);
+  }
 }
