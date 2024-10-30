@@ -15,8 +15,9 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Global Variables
 unsigned long previousMillis = 0;
-unsigned long blinkInterval;
-unsigned long normalInterval = 100; // Default interval for closed eyes
+unsigned long previousMillisTwo = 0;
+unsigned long blinkInterval = 100;
+unsigned long openInterval; // Default interval for closed eyes
 bool isBlinking = false;
 
 // Initialize display setup
@@ -37,7 +38,7 @@ void setup() {
 
   // Set up initial display for normal eyes
   showNormalEyes();
-  blinkInterval = random(3000, 20000);
+  openInterval = random(3000, 20000);
 }
 
 
@@ -58,7 +59,7 @@ void displayText(String line1, String line2, int displayTime) {
 
 // Function for normal open eyes
 void showNormalEyes() {
-  display.clearDisplay();
+  //display.clearDisplay();
   display.setTextSize(3);
   display.setTextColor(WHITE);
   display.setCursor(18, 10);
@@ -73,23 +74,45 @@ void showBlinkingEyes() {
   display.setTextColor(WHITE);
   display.setCursor(18, 10);
   display.println("- ^ -");
-  display.display();
+  //display.display();
 }
 
 void loop() {
   unsigned long currentMillis = millis();
 
-  if (!isBlinking && currentMillis - previousMillis >= blinkInterval) {
+  
+  if (isBlinking = true) {
+    previousMillis = currentMillis;
+  }
+  if (isBlinking && currentMillis - previousMillis <= openInterval) {
+  
+    isBlinking = false;
+    showNormalEyes();
+    
+  }
+
+  if (isBlinking = false) {
+    previousMillisTwo = currentMillis;
+  }
+  if (!isBlinking && currentMillis - previousMillisTwo <= blinkInterval) {
     // when not blinking and time is up, blink. 
     isBlinking = true; //set blinking to true
-    previousMillis = currentMillis;
+    
     showBlinkingEyes();
+    openInterval = random(3000, 20000);
+
   } 
-  else if (isBlinking && currentMillis - previousMillis >= normalInterval) {
-    // when blinking true and time is up, return to normal eyes
-    isBlinking = false;
-    previousMillis = currentMillis;
-    showNormalEyes();
-    blinkInterval = random(3000, 20000);
-  }
+  
+
+
+  int soundValue = analogRead(27);
+  
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(30, 30);
+  display.println(soundValue);
+  Serial.println(soundValue);
+  display.display();
+  display.clearDisplay();
+
 }
